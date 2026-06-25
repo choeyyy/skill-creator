@@ -1,0 +1,26 @@
+{
+  "name": "skill-creator",
+  "displayName": "Skill Creator",
+  "version": "0.1.0",
+  "description": "Systematically create, test, and iterate on Cursor Agent Skills. Provides /SKILL-creator command integrating eval-driven development with prompt engineering best practices.",
+  "author": {
+    "name": "cenhuiying"
+  },
+  "license": "MIT",
+  "keywords": [
+    "skill-creator",
+    "cursor-skills",
+    "prompt-engineering",
+    "eval-framework",
+    "agent-skills"
+  ],
+  "category": "developer-tools",
+  "tags": [
+    "skills",
+    "prompts",
+    "automation",
+    "eval"
+  ],
+  "skills": "./skills/",
+  "commands": "./commands/"
+}
