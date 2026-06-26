@@ -1,0 +1,26 @@
+{
+  "version": 1,
+  "agents": {
+    "orchestrator": "sonnet",
+    "linter": "haiku",
+    "tester": "haiku",
+    "extractor": "haiku"
+  },
+  "lint_rules": {
+    "max_lines": 500,
+    "require_english": true,
+    "require_chinese_output": true,
+    "require_examples": 1,
+    "require_edge_cases": true
+  },
+  "fix": {
+    "max_rounds": 2,
+    "require_confirmation": true,
+    "auto_run_validate": true
+  },
+  "extract": {
+    "enabled": true,
+    "min_duplicate_skills": 2,
+    "min_duplicate_steps": 3
+  }
+}

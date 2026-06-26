@@ -1,21 +1,31 @@
 ---
 name: skill-creator
 description: >-
-  Create, test, and iterate on Cursor Agent Skills with eval-driven development.
-  Use for /SKILL-creator, skill creation, skill testing, skill evaluation,
-  skill iteration, description optimization, or when systematically building
-  agent skills. Even if the user just says "make a skill" or "new skill",
-  use this to guide them through the full lifecycle.
+  Create, test, iterate, and audit Cursor Agent Skills with eval-driven development.
+  Use for /SKILL-creator, /SKILL-lint, /SKILL-fix, /SKILL-pythonGenerator,
+  skill creation, skill testing, skill evaluation, skill iteration, skill audit,
+  description optimization, or when systematically building agent skills.
+  Even if the user just says "make a skill", "new skill", "check my skill",
+  or "lint", use this to guide them through the full lifecycle.
 disable-model-invocation: true
 ---
 
 # Skill Creator — Orchestration
 
-Create, test, and iterate on Cursor Agent Skills. This skill orchestrates the full lifecycle: intent capture → draft → test → iterate → optimize.
+Create, test, iterate, and audit Cursor Agent Skills. This skill orchestrates the full lifecycle: intent capture → draft → test → iterate → optimize → lint → fix → extract.
 
 ## 1. Lifecycle Detection & Routing
 
 Detect where the user is and route to the correct phase. Check these signals in order:
+
+### Command routing (takes priority)
+
+```
+IF user invoked /SKILL-lint  → §7 Lint Audit
+IF user invoked /SKILL-fix   → §8 Auto-Fix
+IF user invoked /SKILL-pythonGenerator → §9 Script Extraction
+OTHERWISE → continue to lifecycle detection below
+```
 
 ### Detection logic
 
@@ -63,7 +73,7 @@ Show a brief results summary from `benchmark.json`, then ask:
 - Option 1 → §5 Iteration
 - Option 2 → §6 Description Optimization
 - Option 3 → §4 Test Execution
-- Option 4 → copy `workspace/SKILL.md` (and references/) to user's chosen location
+- Option 4 → run §7 Lint Audit first; if lint passes, copy `workspace/SKILL.md` (and references/) to user's chosen location; if lint fails, show findings and offer §8 Auto-Fix before completing export
 
 ---
 
@@ -176,14 +186,17 @@ If the skill involves repeatable code patterns, bundle them in `scripts/` rather
 
 ### 3.6 Self-check before presenting
 
-Verify the draft against this checklist:
-- [ ] Description includes trigger keywords and WHAT + WHEN
-- [ ] Body is under 500 lines
-- [ ] Imperative form throughout
-- [ ] Non-obvious rules have "why" explanations
+Verify the draft against the `references/writing-guide.md` quick-reference checklist and these structural rules:
+- [ ] Description includes trigger keywords and WHAT + WHEN (writing-guide §5)
+- [ ] Body is under 500 lines (writing-guide §3)
+- [ ] Imperative form throughout (writing-guide §1)
+- [ ] Non-obvious rules have "why" explanations (writing-guide §2)
 - [ ] References are one level deep
 - [ ] No time-sensitive information
 - [ ] Consistent terminology
+- [ ] Output templates provided where structure matters (writing-guide §6)
+
+After the manual checklist, run a lint pass (§7 Lint Audit) against the draft. If lint reports errors or warnings, fix them before presenting to the user. This prevents exporting a skill that would fail the lint-on-export gate.
 
 Present the draft to the user and ask for feedback before proceeding.
 
@@ -387,6 +400,24 @@ Apply the winning description to `workspace/SKILL.md` frontmatter.
 
 ---
 
+## 7. Lint Audit
+
+See `commands/SKILL-lint.md` for scope resolution, dispatch strategy, and reporting logic. Dispatches to `agents/linter.md` (Haiku sub-agent).
+
+---
+
+## 8. Auto-Fix
+
+See `commands/SKILL-fix.md` for entry points, fix procedure, and confirmation gate. Dispatches to `agents/fixer.md` (Haiku sub-agent).
+
+---
+
+## 9. Script Extraction
+
+See `commands/SKILL-pythonGenerator.md` for scan scope, detection, proposal, and generation logic. Dispatches to `agents/extractor.md` (Haiku sub-agent).
+
+---
+
 ## Reference Files
 
 These files contain detailed protocols referenced throughout this skill. Read them on demand, not upfront.
@@ -396,14 +427,21 @@ These files contain detailed protocols referenced throughout this skill. Read th
 | `references/writing-guide.md` | Prompt engineering techniques for skill authoring: imperative form, explain-why, pushy descriptions, progressive disclosure, few-shot patterns |
 | `references/eval-workflow.md` | Full eval protocol: test case format, execution details, grading rubric, benchmark computation |
 | `references/schemas.md` | JSON schemas for `evals.json`, `grading.json`, `benchmark.json`, `history.json`, `timing.json` |
+| `references/lint-rules.md` | 9-dimension criteria definitions, scoring rubric, language rules, report template |
+| `references/fix-report-format.md` | Fix operation report format (Chinese): findings, fixes, validation, remaining issues |
+| `references/extraction-patterns.md` | Common extractable patterns catalog with detection heuristics |
 
 ## Agent Files
 
 | Agent | Purpose |
 |:------|:--------|
+| `agents/tester.md` | Execute a single eval test case (with or without skill), capture transcript and outputs for grading |
 | `agents/grader.md` | Evaluate test outputs against expectations, produce structured grading |
 | `agents/analyzer.md` | Surface patterns and regressions from benchmark data |
 | `agents/comparator.md` | Blind A/B comparison between skill versions |
+| `agents/linter.md` | Audit a single skill for language discipline + 9-dimension template compliance |
+| `agents/fixer.md` | Auto-repair skill issues — logic first, then format enforcement |
+| `agents/extractor.md` | Detect extractable deterministic logic patterns across skills |
 
 ## Script Files
 

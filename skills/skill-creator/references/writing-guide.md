@@ -1,261 +1,189 @@
-# Skill Authoring — Prompt Engineering Guide
+# Writing Guide — Skill Authoring Best Practices
 
-Six techniques that directly improve SKILL.md quality, distilled from Anthropic's prompt engineering research.
-
----
-
-## 1. Imperative Form + Explain Why
-
-**What:** Write instructions as direct commands. Pair each rule with a brief reason.
-
-**Why it matters:** Imperative form is more token-efficient and less ambiguous for agent-read prose. Explaining "why" leverages the model's theory of mind — it generalizes the rule to edge cases you didn't enumerate.
-
-### Before (weak)
-
-```markdown
-It would be nice if the agent checked for existing files before creating new ones.
-You should probably avoid creating documentation unless asked.
-```
-
-### After (strong)
-
-```markdown
-Check for existing files before creating new ones — overwrites destroy user work silently.
-NEVER create documentation files unless explicitly requested — users find unsolicited READMEs intrusive.
-```
-
-**Key insight:** Bare MUST/NEVER without reasons get ignored under pressure. "NEVER do X — because Y" sticks because the model understands the consequence.
+Practical principles for writing effective SKILL.md files. Derived from prompt engineering fundamentals, adapted for Cursor Agent Skills.
 
 ---
 
-## 2. Pushy Descriptions (Counter Under-Trigger)
+## 1. Imperative Form
 
-**What:** Write the skill description to aggressively claim its trigger space. List keywords, synonyms, and say "Use even when…".
-
-**Why it matters:** Claude tends to under-trigger skills — it won't activate a skill unless the match is obvious. Pushy descriptions lower the activation threshold.
-
-### Before (under-triggers)
-
-```markdown
-Help with database migrations.
-```
-
-### After (reliably triggers)
-
-```markdown
-Database schema migrations and versioning. Use for /migrate, migration, schema change, alter table, 
-add column, DB upgrade, even when user just says "update the database" without mentioning migrations.
-```
-
-### Pattern
+Write instructions as direct commands, not suggestions.
 
 ```
-<short summary>. Use for <keyword1>, <keyword2>, ... even when <non-obvious trigger scenario>.
+# Good
+Read the config file. Extract the API key. Validate the format.
+
+# Bad
+You should read the config file. Then you would extract the API key.
 ```
 
-**Key insight:** If users would benefit from the skill but might not phrase it perfectly, the description must meet them halfway.
+Why: imperative form is shorter, unambiguous, and matches how agents process instructions.
 
 ---
 
-## 3. Data/Instruction Separation
+## 2. Explain-Why Pattern
 
-**What:** Clearly separate template content (data the agent fills in) from behavioral rules (instructions the agent follows). Use distinct formatting for each.
+Non-obvious rules need a brief reason. Bare MUST/NEVER without context invites the agent to misapply or ignore them.
 
-**Why it matters:** When templates and rules are mixed, the model confuses "output this literally" with "follow this guideline." Separation prevents the agent from treating template placeholders as instructions or vice versa.
+```
+# Good
+Keep references one level deep — chained references cause context loss
+  when the agent navigates multiple hops.
 
-### Before (mixed — confusing)
-
-```markdown
-Create a file with a title section. The title should be descriptive. Use ## for the heading.
-Then add a description. Keep it under 100 words. Use plain language.
+# Bad
+References MUST be one level deep.
 ```
 
-### After (separated)
-
-```markdown
-## Rules
-- Title must be descriptive and specific to the task
-- Description stays under 100 words in plain language
-
-## Output Template
-\```
-## {{title}}
-
-{{description}}
-\```
-```
-
-### Techniques for separation
-
-| Signal | Use for |
-|--------|---------|
-| `## Rules` / `## Template` headings | Top-level separation |
-| Code fences for templates | Mark literal output structure |
-| `{{placeholder}}` syntax | Show where dynamic content goes |
-| Prose paragraphs for rules | Behavioral instructions |
+Obvious rules (e.g., "write valid JSON") don't need justification. Reserve explanations for constraints the agent can't infer from general knowledge.
 
 ---
 
-## 4. Progressive Disclosure (500-Line Limit)
+## 3. Progressive Disclosure
 
-**What:** Keep SKILL.md under 500 lines. Move detailed references, examples, and lookup tables into `references/` files that the skill loads on demand.
+Structure information in layers:
 
-**Why it matters:** Long skills waste context window on every invocation — even when 80% of the content isn't needed for the current task. Short skills load fast; reference files provide depth only when relevant.
+| Layer | Contains | Guideline |
+|:------|:---------|:----------|
+| **Description** (frontmatter) | Trigger keywords + WHAT + WHEN | ≤ 3 lines |
+| **Body** (SKILL.md) | Essential workflow, decision logic, constraints | ≤ 500 lines |
+| **References** (`references/`) | Detailed schemas, examples, lookup tables | Read on demand |
 
-### Structure
-
-```
-skills/my-skill/
-├── SKILL.md              # ≤500 lines — core flow + rules
-└── references/
-    ├── api-patterns.md   # Loaded when skill needs API details
-    ├── error-catalog.md  # Loaded when debugging
-    └── examples.md       # Loaded for complex scenarios
-```
-
-### In SKILL.md — reference loading pattern
-
-```markdown
-## References
-When implementing API calls, read `references/api-patterns.md` first.
-For error handling, consult `references/error-catalog.md`.
-```
-
-### What stays in SKILL.md vs references
-
-| In SKILL.md | In references/ |
-|--------------|----------------|
-| Trigger description | Detailed examples |
-| Core workflow steps | Lookup tables |
-| Critical rules (≤15) | Edge case catalogs |
-| Output format | API documentation |
+Body should be self-sufficient for the common case. References handle edge cases, detailed formats, and domain data the agent shouldn't memorize.
 
 ---
 
-## 5. Few-Shot Examples Pattern
+## 4. Few-Shot Examples
 
-**What:** Include 1-3 concrete input→output examples showing the skill's expected behavior. Wrap in `<example>` tags with optional reasoning.
+Include 1-2 concrete input/output examples for tasks where output format matters.
 
-**Why it matters:** Examples anchor behavior more reliably than abstract rules. One good example eliminates paragraphs of explanation.
+```
+### Example
 
-### Pattern
+Input: "help me make a skill for code review"
 
-```markdown
-<example>
-User: "Add a login page"
-Agent action:
-1. Check for existing auth components
-2. Create `src/pages/Login.tsx` with form
-3. Add route in `src/App.tsx`
-4. Run linter
-</example>
-
-<example>
-User: "Fix the header"
-Agent action:
-1. Read the header component
-2. Identify the issue from context/lints
-3. Apply minimal fix
-4. Verify no regressions
-</example>
+Expected intent capture:
+  Name:      code-review
+  Purpose:   Automated code review with project-specific rules
+  Triggers:  Keyword detection ("review", "check code")
+  Output:    Chat response (analysis + suggestions)
 ```
 
-### Guidelines
+When to add examples:
+- Output has a specific structure (JSON, tables, reports)
+- The task involves classification or judgment calls
+- Users report format inconsistencies
 
-- **1 example** for simple skills with predictable behavior
-- **2-3 examples** for skills with branching logic or ambiguous inputs
-- **Show the hard case** — easy cases don't need examples, tricky ones do
-- **Include reasoning** when the decision isn't obvious from input alone
-
-### Before (rules only — ambiguous)
-
-```markdown
-When the user asks to fix something, determine scope and apply minimal changes.
-```
-
-### After (example makes it concrete)
-
-```markdown
-<example>
-User: "Fix the broken test"
-Agent:
-1. Run test suite to identify failure
-2. Read failing test + source under test
-3. Fix root cause (not the assertion)
-4. Re-run to confirm green
-<reasoning>
-Fix targets root cause, not symptoms. "Minimal" means don't refactor adjacent code.
-</reasoning>
-</example>
-```
+When to skip:
+- Output is freeform text
+- The task is straightforward (read file, run command)
 
 ---
 
-## 6. Output Format Control
+## 5. Pushy Descriptions
 
-**What:** Define exact output structure using templates, headings, or tagged sections. Specify what to include AND what to omit.
+The frontmatter `description` controls when the agent loads the skill. Make it aggressive about triggering.
 
-**Why it matters:** Without format control, agents produce inconsistent outputs — sometimes verbose prose, sometimes bare lists. Templates guarantee parseable, predictable results.
+**Formula**: trigger keywords + WHAT it does + WHEN to use it + inclusive phrasing
 
-### Template approach
-
-```markdown
-## Output Format
-Report using exactly this structure:
-
-**Status:** DONE | BLOCKED | NEEDS_INPUT
-**Changed:** <file list>
-**Summary:** <1-2 sentences>
+```yaml
+description: >-
+  Create, test, and iterate Cursor Agent Skills. Use for skill creation,
+  skill testing, evaluation, or when user says "make a skill", "new skill",
+  "check my skill". Even if user just says "prompt" or "lint", use this.
 ```
 
-### Exclusion control (equally important)
-
-```markdown
-Do NOT include:
-- Line numbers or file paths in prose
-- Tool call details
-- Apologies or filler phrases
-```
-
-### Before (uncontrolled)
-
-```markdown
-Tell the user what you did.
-```
-
-### After (controlled)
-
-```markdown
-## Completion Report
-End every task with:
-
-\```
-Status: DONE | DONE_WITH_CONCERNS | BLOCKED
-Files: <changed file paths, one per line>
-Notes: <only if DONE_WITH_CONCERNS or BLOCKED>
-\```
-
-Omit the Notes field entirely when Status is DONE.
-```
-
-### Techniques
-
-| Technique | When to use |
-|-----------|-------------|
-| Literal template with placeholders | Structured reports, file generation |
-| Enum values (`A | B | C`) | Constrain categorical fields |
-| "Omit X entirely" | Prevent hallucinated/filler sections |
-| "Exactly N sentences" | Control verbosity |
+Techniques:
+- List synonyms and abbreviations the user might use
+- Add "even if user doesn't mention X" for non-obvious triggers
+- Include both English and Chinese trigger words if bilingual users expected
+- Err on the side of over-triggering — false positives are cheaper than missed activations
 
 ---
 
-## Quick Reference
+## 6. Output Templates
 
-| # | Technique | One-liner |
-|---|-----------|-----------|
-| 1 | Imperative + Why | Command form, always explain the reason |
-| 2 | Pushy Descriptions | Over-claim trigger space to counter under-trigger |
-| 3 | Data/Instruction Split | Templates in fences, rules in prose |
-| 4 | Progressive Disclosure | SKILL.md ≤500 lines, detail in references/ |
-| 5 | Few-Shot Examples | 1-3 concrete input→output pairs |
-| 6 | Output Format Control | Template the exact output structure |
+When structure matters, provide the exact format. Don't describe it — show it.
+
+```
+### Output format
+
+```json
+{
+  "name": "...",
+  "status": "PASS | FAIL",
+  "findings": [
+    { "rule": "...", "severity": "error | warning", "detail": "..." }
+  ]
+}
+```
+```
+
+Why: agents reproduce templates more faithfully than they follow prose descriptions of structure.
+
+---
+
+## 7. Conciseness
+
+The agent already knows how to code, reason, and use tools. Only add information it wouldn't already have:
+
+- Domain-specific conventions
+- Project-specific file paths and patterns
+- Non-obvious decision criteria
+- Constraints that override default behavior
+
+**Cut ruthlessly**: if removing a sentence doesn't change the agent's behavior, remove it.
+
+---
+
+## 8. Constraint Clarity
+
+State explicit do/don't rules. Provide escape hatches so the agent isn't stuck.
+
+```
+# Good
+Do not modify files outside the workspace/ directory.
+If the user explicitly requests changes elsewhere, confirm the path before proceeding.
+
+# Bad
+Be careful about file modifications.
+```
+
+Pattern:
+1. State the constraint
+2. State the escape condition (if any)
+3. Brief reason (if non-obvious)
+
+---
+
+## 9. Data-Instruction Separation
+
+Use XML tags or clear delimiters to separate variable data from fixed instructions.
+
+```
+Analyze the skill at the path below and report issues.
+
+<skill_path>
+{{SKILL_PATH}}
+</skill_path>
+
+<lint_config>
+{{CONFIG_JSON}}
+</lint_config>
+```
+
+Why: prevents the agent from confusing user data with instructions. Especially important when skill content is injected as context for another agent (grader, linter, etc.).
+
+---
+
+## Quick Reference Checklist
+
+Before finalizing any skill file, verify:
+
+- [ ] All instructions use imperative form
+- [ ] Non-obvious rules include a brief "why"
+- [ ] Body ≤ 500 lines; detail in references/
+- [ ] 1-2 examples for output-sensitive tasks
+- [ ] Description includes trigger keywords + WHAT + WHEN
+- [ ] Output templates provided where structure matters
+- [ ] No redundant instructions the agent already knows
+- [ ] Do/don't constraints have escape hatches
+- [ ] Variable data separated from instructions with tags

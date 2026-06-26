@@ -1,8 +1,8 @@
 {
   "name": "skill-creator",
   "displayName": "Skill Creator",
-  "version": "0.1.0",
-  "description": "Systematically create, test, and iterate on Cursor Agent Skills. Provides /SKILL-creator command integrating eval-driven development with prompt engineering best practices.",
+  "version": "0.2.0",
+  "description": "Create, lint, fix, and extract reusable Python scripts from Cursor Agent Skills. Eval-driven development with prompt engineering best practices.",
   "author": {
     "name": "cenhuiying"
   },
@@ -12,15 +12,45 @@
     "cursor-skills",
     "prompt-engineering",
     "eval-framework",
-    "agent-skills"
+    "agent-skills",
+    "linter",
+    "auto-fix"
   ],
   "category": "developer-tools",
   "tags": [
     "skills",
     "prompts",
     "automation",
-    "eval"
+    "eval",
+    "lint",
+    "codegen"
   ],
   "skills": "./skills/",
-  "commands": "./commands/"
+  "commands": [
+    {
+      "name": "SKILL-creator",
+      "description": "Create, test, and iterate on Cursor Agent Skills with eval-driven development",
+      "entry": "skills/skill-creator/SKILL.md"
+    },
+    {
+      "name": "SKILL-lint",
+      "description": "Audit skill files for structural issues, best-practice violations, and spec drift",
+      "entry": "commands/SKILL-lint.md"
+    },
+    {
+      "name": "SKILL-fix",
+      "description": "Auto-repair skill files — fix logic issues first, then format enforcement, with diff confirmation",
+      "entry": "commands/SKILL-fix.md"
+    },
+    {
+      "name": "SKILL-pythonGenerator",
+      "description": "Extract deterministic, repetitive logic from skills into reusable Python CLI scripts",
+      "entry": "commands/SKILL-pythonGenerator.md"
+    },
+    {
+      "name": "SKILL-setup",
+      "description": "Install, update, configure, or uninstall the skill-creator plugin",
+      "entry": "setup/SKILL.md"
+    }
+  ]
 }
