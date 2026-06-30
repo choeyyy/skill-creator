@@ -7,8 +7,8 @@ Resolve which skill to fix, run the linter, dispatch fixes, and confirm with the
 
 **Scope resolution** (run as orchestrator):
 
-1. User specifies a skill name → locate its `SKILL.md`
-2. No specification → if a `SKILL.md` is open in the editor, target that file; otherwise ask the user which skill to fix
+1. User specifies skill name(s) or path(s) → collect ALL of them into an ordered list, locate each skill's `SKILL.md`
+2. No specification → if a `SKILL.md` is open in the editor, target that file; otherwise ask the user which skill(s) to fix
 
 **Fix procedure**:
 
@@ -29,6 +29,9 @@ Resolve which skill to fix, run the linter, dispatch fixes, and confirm with the
 
 **Dispatch strategy**:
 
-- The fixer agent runs inline (read `agents/fixer.md` and execute in this conversation) — fix operations are single-file and benefit from conversational context with the user for confirmation
+- **Single skill**: run the fix procedure inline (read `agents/fixer.md` and execute in this conversation) — benefits from conversational context with the user for confirmation
+- **Multiple skills**: run the fix procedure for each skill **one at a time, in order** — complete the full lint → classify → fix → confirm → apply → validate cycle for skill N before moving to skill N+1. **You MUST process every skill in the list. Do not stop after the first one.**
+
+**Multi-skill enforcement**: After completing all skills, output a summary table listing each skill, the issues fixed, and the final validation result.
 
 **Output**: present all findings and fix proposals in Chinese using the report format defined in `references/fix-report-format.md`.
