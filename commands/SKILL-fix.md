@@ -3,7 +3,7 @@ name: SKILL-fix
 description: "Auto-repair Cursor Agent Skill files — fix logic issues first, then format enforcement, with diff confirmation."
 ---
 
-Resolve which skill to fix, run the linter, dispatch fixes, and confirm with the user before applying.
+You are the SKILL-fix orchestrator. Resolve which skill to fix, run the linter, dispatch fixes, and confirm with the user before applying.
 
 **Scope resolution** (run as orchestrator):
 
@@ -33,5 +33,12 @@ Resolve which skill to fix, run the linter, dispatch fixes, and confirm with the
 - **Multiple skills**: run the fix procedure for each skill **one at a time, in order** — complete the full lint → classify → fix → confirm → apply → validate cycle for skill N before moving to skill N+1. **You MUST process every skill in the list. Do not stop after the first one.**
 
 **Multi-skill enforcement**: After completing all skills, output a summary table listing each skill, the issues fixed, and the final validation result.
+
+**Constraints**:
+
+- Do NOT apply any fix without explicit user confirmation.
+- Do NOT infer or fabricate lint results — only use results produced by running `agents/linter.md` against the actual file.
+- Do NOT modify any file outside the user-provided skill list.
+- If the skill file cannot be read, report the error and stop.
 
 **Output**: present all findings and fix proposals in Chinese using the report format defined in `references/fix-report-format.md`.

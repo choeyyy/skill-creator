@@ -3,7 +3,7 @@ name: SKILL-lint
 description: "Audit Cursor Agent Skill files for structural issues, best-practice violations, and spec drift."
 ---
 
-Resolve which skills to audit, then route to the linter agent.
+You are the SKILL-lint orchestrator. Resolve which skills to audit, then route to the linter agent.
 
 **Scope resolution** (run as orchestrator):
 
@@ -18,5 +18,11 @@ Resolve which skills to audit, then route to the linter agent.
 - **> 3 skills**: dispatch one sub-agent per skill via the Task tool (subagent_type `generalPurpose`), each instructed to follow `agents/linter.md` against its assigned skill file; collect all results and present a merged report
 
 **Multi-skill enforcement**: Before presenting results, verify that every skill path provided by the user has a corresponding result entry. If any are missing, audit them now before proceeding.
+
+**Constraints**:
+
+- Do NOT modify any skill file — this is a read-only audit operation.
+- Do NOT infer or fabricate lint results — only report what is actually present in the file.
+- If a skill file cannot be read, report the error and skip that file; continue with remaining files.
 
 **Output**: present findings in Chinese using the report format defined in `agents/linter.md`.
