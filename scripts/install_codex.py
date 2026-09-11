@@ -31,7 +31,8 @@ def build_bundle(plugin_root: Path = PLUGIN_ROOT) -> dict[str, str]:
     command = command.replace("(../skills/skill-creator/", "(")
     command = command.replace("plugin-root `config/defaults.json`", "skill-root `config/defaults.json`")
     command = command.replace("/SKILL-lint", "$skill-lint")
-    bundle = {"SKILL.md": command}
+    command = command.replace("(../references/host-compatibility.md)", "(references/host-compatibility.md)")
+    bundle = {"SKILL.md": command, "references/host-compatibility.md": (plugin_root / "references/host-compatibility.md").read_text(encoding="utf-8")}
     for relative in RESOURCES:
         bundle[relative] = (plugin_root / "skills/skill-creator" / relative).read_text(encoding="utf-8-sig")
     bundle["config/defaults.json"] = (plugin_root / "config/defaults.json").read_text(encoding="utf-8-sig")

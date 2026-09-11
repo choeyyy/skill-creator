@@ -16,7 +16,7 @@ class InstallCodexTests(unittest.TestCase):
     def test_installed_bundle_resolves_all_relative_links(self):
         with tempfile.TemporaryDirectory() as tmp:
             destination = Path(tmp) / "skill-lint"
-            self.assertEqual(len(installer.install(destination)), 7)
+            self.assertEqual(len(installer.install(destination)), 8)
             for path in destination.rglob("*.md"):
                 for relative in re.findall(r"\[[^\]]+\]\(([^)]+)\)", path.read_text(encoding="utf-8")):
                     if not re.match(r"\w+://", relative):

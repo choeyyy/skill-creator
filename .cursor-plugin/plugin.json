@@ -1,8 +1,8 @@
 {
   "name": "skill-creator",
   "displayName": "Skill Creator",
-  "version": "1.0.0",
-  "description": "Create, lint, fix, and extract reusable Python scripts from Cursor Agent Skills. Eval-driven development with prompt engineering best practices.",
+  "version": "1.0.1",
+  "description": "Create, lint, fix, and extract reusable Python scripts from Agent Skills for Cursor, Codex and Claude Code. Eval-driven development with prompt engineering best practices.",
   "author": {
     "name": "cenhuiying"
   },
@@ -29,7 +29,7 @@
   "commands": [
     {
       "name": "SKILL-creator",
-      "description": "Create, test, and iterate on Cursor Agent Skills with eval-driven development",
+      "description": "Create, test, and iterate on Agent Skills for Cursor, Codex and Claude Code with eval-driven development",
       "entry": "skills/skill-creator/SKILL.md"
     },
     {

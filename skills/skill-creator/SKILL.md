@@ -10,6 +10,11 @@ description: >-
 disable-model-invocation: true
 ---
 
+## Host compatibility
+
+Read [host capability mapping](../../references/host-compatibility.md) before using tools. It governs host-specific tool names, model arguments, installation paths and unavailable capabilities throughout this workflow. Keep all task approval and evidence requirements.
+
+
 # Skill Creator — Orchestration
 
 Create, test, iterate, and audit Cursor Agent Skills. This skill orchestrates the full lifecycle: intent capture → draft → test → iterate → optimize → lint → fix → extract.

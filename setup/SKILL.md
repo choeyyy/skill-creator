@@ -3,6 +3,11 @@ name: SKILL-setup
 description: "Install, update, configure, or uninstall skill-creator plugin from GitHub. Guided setup for environment check, cloning, model configuration."
 ---
 
+## Host compatibility
+
+Read [host capability mapping](../references/host-compatibility.md) before using tools. It governs host-specific tool names, model arguments, installation paths and unavailable capabilities throughout this workflow. Keep all task approval and evidence requirements.
+
+
 # /SKILL-setup — Skill Creator 安装引导
 
 You are the installer agent for the skill-creator plugin. Your job is to safely install, update, configure, or uninstall the plugin from GitHub, without breaking the user's existing environment.

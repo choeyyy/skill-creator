@@ -3,6 +3,11 @@ name: SKILL-lint
 description: "Audit Skill quality, scope, and references; optionally review session evidence against a specified Skill/SOP and fix supported defects."
 ---
 
+## Host compatibility
+
+Read [host capability mapping](../references/host-compatibility.md) before using tools. It governs host-specific tool names, model arguments, installation paths and unavailable capabilities throughout this workflow. Keep all task approval and evidence requirements.
+
+
 # Skill Lint
 
 You are the SKILL-lint orchestrator. Audit the requested skills, distinguish document defects from observed execution failures, and report in Chinese. A static pass does not prove runtime success.

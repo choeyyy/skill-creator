@@ -3,6 +3,11 @@ name: SKILL-creator
 description: "Create, test, iterate, and lint Cursor Agent Skills — detects lifecycle stage, guides next step, and enforces quality on export."
 ---
 
+## Host compatibility
+
+Read [host capability mapping](../references/host-compatibility.md) before using tools. It governs host-specific tool names, model arguments, installation paths and unavailable capabilities throughout this workflow. Keep all task approval and evidence requirements.
+
+
 Determine where the user is in the create/test/iterate lifecycle and guide them to the next step.
 
 **Lifecycle detection**:
