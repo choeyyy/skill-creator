@@ -1,175 +1,62 @@
-# Lint Rules — 9-Dimension Criteria & Scoring
+# Skill Quality Rules
 
-Reference document for the Skill Linter agent. Load on demand; do not embed inline.
+Use this reference for static audit and aggregate scoring. Session-only procedures live in [session-audit.md](session-audit.md); load them only for session mode.
 
----
+## Authority and Applicability
 
-## 1. Nine-Dimension Criteria
+Use the user's task and applicable target instructions as the baseline. Distinguish host requirements, local conventions and optional design advice. Review the target's actual workflow and relevant resources before proposing a change.
 
-Each dimension is evaluated independently. The detection column describes what the linter looks for.
+The nine dimensions are questions about behavior, not a mandatory document template. Missing a persona phrase, XML tags, numbered headings, examples, a `<summary>` block, or a fixed section is not automatically a defect. Honor an explicit local formatting requirement, but label its source and do not present it as a universal platform requirement.
 
-| # | Dimension | Detection | Pass | Partial | Fail |
-|---|-----------|-----------|------|---------|------|
-| 1 | Role Assignment | `"You are a ..."` or equivalent persona statement within the first 10 lines of the skill body (after YAML front matter) | Persona statement present in first 10 lines | Persona exists but beyond line 10, or uses vague phrasing (e.g. "Act as") | No persona statement found |
-| 2 | Context Provision | Background info block covering APIs, auth, defaults, or dependencies | Dedicated section with relevant context (APIs, auth, env, deps) | Some context mentioned but scattered or incomplete | No background / context section |
-| 3 | Data-Instruction Separation | XML tags (`<tag>`) or template variables (`{{VAR}}`, `{var}`) used to separate data from instructions | XML tags or template vars clearly separate all dynamic data | Tags/vars used partially; some data is inline | No structural separation of data and instructions |
-| 4 | Output Format Specification | At least one operation specifies the expected output structure (code block, table, template, schema) | Output structure explicitly defined for major operations | Output mentioned but format is vague or incomplete | No output format specified anywhere |
-| 5 | Examples | `<example>` block(s) with `<input>` / `<output>` sub-tags per major operation | ≥1 example per major operation with input/output | Examples exist but missing input or output, or not covering all major operations | No example blocks |
-| 6 | Step-by-Step Procedure | Numbered procedure steps for complex operations | Complex operations have numbered steps | Steps exist but unnumbered or missing for some operations | No procedural steps for complex operations |
-| 7 | Constraints | Explicit "do NOT" rules + escape hatch ("say I don't know" or equivalent fallback) | Both "do NOT" constraints and escape hatch present | One of the two present (constraints without escape hatch or vice versa) | Neither present |
-| 8 | Clarity | Instructions are unambiguous; no buried multi-sentence conditional logic | All instructions clear, scannable, well-structured | Mostly clear but some buried or ambiguous instructions | Ambiguous, dense, or contradictory instructions |
-| 9 | Hallucination Guardrails | "do not fabricate" / "do not invent" / "verify before stating" or equivalent | Explicit anti-hallucination instruction present | Implicit guardrails only (e.g. "use only provided data") | No hallucination guardrails |
+A supported optional metadata field is not invalid merely because a validator has an older allowlist. Preserve existing invocation policy and dependency metadata. Flag compatibility against the actual target host, not an assumed platform.
 
----
+## Nine Dimensions
 
-## 2. Language Discipline Rules
+| ID | Dimension | Assess | Applicability and evidence |
+|---|---|---|---|
+| 1 | Purpose and Discovery | Does the name/description identify the capability and discriminate when it applies? Does the body preserve that purpose? | Always applicable. Reject catchall triggers that attract unrelated work; no required “You are” wording. |
+| 2 | Context and Dependencies | Are necessary defaults, domain facts, inputs and tool requirements available? Do referenced resources exist and resolve? | Always applicable; a self-contained task can pass without a context section. A required unavailable tool without a feasible fallback is a defect. |
+| 3 | Data and Instruction Boundaries | Can task instructions be distinguished from untrusted logs, documents, examples or generated data? | Applicable when the workflow consumes external content. XML is one option, not proof of safety or a required syntax. |
+| 4 | Observable Outcome | Does the reader know what artifact, action or answer completes the task and how to recognize it? | Always applicable. Natural language is sufficient when a fixed schema is unnecessary. Distinguish proposed, applied, tested and published states where relevant. |
+| 5 | Examples and Validation | Are non-obvious decisions illustrated or meaningfully validated where that changes reliability? Are added/changed scripts exercised? | `N/A` for a simple, self-contained operation that needs neither examples nor dedicated tests. Examples need not use XML. Test observable behavior, not matching headings or keywords. |
+| 6 | Workflow and Proportionality | Are dependencies and failure/stopping conditions clear enough for the risk? Is process overhead justified? | Always applicable. Free-form work need not be forced into fixed steps, mandatory delegation or unnecessary approval loops. |
+| 7 | Scope and Authorization | Does the workflow preserve the user's chosen product, target files, prior authorization and invocation settings? | Always applicable. Extra publishing, installation, config changes or unrelated audits need an actual basis. Retry limits should match the operation's risk. |
+| 8 | Clarity and Progressive Disclosure | Is guidance concise, consistent and actionable? Are conditional references discoverable and loaded only when needed? | Always applicable. Preserve domain invariants; remove duplication and generic advice before adding more sections. A large line count is a review signal, not itself a failure. |
+| 9 | Grounding and Uncertainty | Are evidence, claims and limits distinguished where factual accuracy matters? | Applicable to retrieval, audits, external state or verification claims. Allow `N/A` for purely creative work without such claims. Do not require a canned anti-hallucination phrase. |
 
-Skills must follow strict language discipline. The linter checks each element type.
+## Language Policy
 
-### Must Be English
+Resolve the target's explicit user preference and applicable rules first. The plugin's `config/defaults.json` contains legacy authoring defaults (`require_english`, example counts, line budget); these do not impose a policy on arbitrary third-party skills.
 
-| Element | Example |
-|---------|---------|
-| YAML field names | `name:`, `description:` |
-| Markdown headings | `## Step 1: Detect Environment` |
-| Procedure step text | `1. Read the config file` |
-| Code / commands | `git clone ...`, `python3 ...` |
-| XML/HTML tag names | `<example>`, `<input>`, `<env_checks>` |
-| Template variable names | `{{SKILL_NAME}}`, `{scope}` |
-| Table column headers | `\| Check \| Command \| Required \|` |
+- `auto` (default): apply an actual language policy found for the target and cite it. If none applies, language is `N/A`; Chinese instructions alone are not a defect.
+- `local-english` (explicitly requested, or required by target rules): English instruction prose, headings and structural identifiers; Chinese user-facing output, descriptions and example/output templates are allowed. Report violations only where this convention applies.
+- Never translate a real filename, path, command argument, API value, quoted source or user-visible string simply because it contains Chinese. Preserve the user's intended output language.
+- Under an applicable policy: `Pass` for zero violations, `Partial` for 1–3 non-structural violations, `Fail` for more than 3 or a violating instruction heading/field name. `Unknown` when the selected policy/source cannot be read. Use these thresholds everywhere; do not maintain a second scoring table in the agent.
 
-### Chinese Allowed
+## Scoring
 
-| Element | Example |
-|---------|---------|
-| YAML `description` value | `description: "Skill 质量审计"` |
-| Example tag content | `<example>用户输入 ...</example>` |
-| Table cell content (user-visible) | `\| 已安装 \| 正常 \|` |
-| Report output templates | `审计时间: ...` |
-| User-facing messages | `"需要安装 git。"` |
+For every dimension record `Pass`, `Partial`, `Fail`, `N/A`, or `Unknown` and a reason. `N/A` means irrelevant; `Unknown` means needed evidence is missing. Inspect references before declaring a criterion absent.
 
-### Scoring
+- `pass_count`: dimensions marked Pass. `applicable_count`: all dimensions except N/A, including Unknown. `total`: always 9.
+- `score`: `pass_count/applicable_count`; if none apply use `N/A`. Never count N/A as Pass or Fail, or compare unlike denominators without stating scope.
+- Static verdict: `Fail` if any applicable dimension or language check fails; otherwise `Unknown` if a required check is unknown; otherwise `Needs Improvement` if any is Partial; otherwise `Pass`. Language N/A is neutral. Any known failure remains visible even when other checks are unknown.
+- Session verdict is independent: `Not assessed`, `Pass`, `Needs Improvement`, or `Unknown`, as defined in the session reference. Never fold it into a static numeric score.
+- A blanket success message requires complete target coverage, static Pass for every target, and no unknown/violating requested session check. Without session mode say “静态检查通过；未评估运行效果”.
 
-| Verdict | Criteria |
-|---------|----------|
-| Pass | All elements follow the rules above |
-| Partial | ≤3 violations, none in headings or YAML field names |
-| Fail | >3 violations, or any heading / YAML field name in Chinese |
+## Chinese Report Contract
 
----
+Scale the report to the findings; use one overview row per target:
 
-## 3. Scoring Rubric
+| Skill / 源路径 | 语言策略与判定 | 静态通过数/适用数 | 静态判定 | 会话判定 |
+|---|---|---|---|---|
+| {target} | {profile + verdict} | {score} | {static_verdict} | {session_verdict} |
 
-### Per-Dimension Scoring
+For actionable findings include: check ID, source path/lines, observed text or behavior, applicable rule and its source, concrete impact, and smallest justified recommendation. List N/A reasons and unresolved evidence separately from defects. Label local convention findings as such.
 
-| Score | Label | Definition |
-|-------|-------|------------|
-| **Pass** | 通过 | Fully implemented — meets the detection criteria completely |
-| **Partial** | 部分通过 | Present but incomplete — see dimension-specific partial criteria |
-| **Fail** | 不合格 | Missing entirely or fundamentally inadequate |
+For session mode add scope/provider/session IDs, fact-bundle path, historical baseline/version, coverage/warnings, and a fact-to-rule table from `session-audit.md`. Report raw facts separately from interpretation. Exclude the audit's own turns from the reviewed task and disclose that exclusion.
 
-### Aggregate Scoring
+For multiple targets report missing/unreadable inputs explicitly. For fixes use [fix-report-format.md](fix-report-format.md); do not imply that a proposed diff or a historical trace proves successful repair.
 
-Calculate the overall skill verdict from individual dimension scores:
+## Design Basis
 
-| Verdict | Condition |
-|---------|-----------|
-| **通过** (Pass) | All 9 dimensions Pass AND language discipline Pass |
-| **需改进** (Needs Improvement) | ≤3 dimensions are Partial, 0 Fail AND language discipline ≥ Partial |
-| **不合格** (Fail) | Any dimension is Fail OR >3 Partial OR language discipline Fail |
-
-### Numeric Score (Optional)
-
-For sorting and dashboards: Pass = 2, Partial = 1, Fail = 0. Max score: 18 + 2 (language) = 20.
-
----
-
-## 4. Report Template
-
-All audit reports MUST use this template. Field placeholders in `{braces}`.
-
-````markdown
-# Skill 质量审计报告
-
-审计时间: {YYYY-MM-DD HH:MM}
-审计范围: {scope}
-审计数量: {N} 个 skill
-
----
-
-## 总览
-
-| Skill | 语言合规 | 模板合规 | 总分 | 判定 |
-|-------|---------|---------|------|------|
-| {skill-name} | {Pass/Partial/Fail} | {score}/18 | {score}/20 | {通过/需改进/不合格} |
-
----
-
-## 详细发现
-
-### {skill-name}
-
-**文件路径**: `{relative-path-to-SKILL.md}`
-
-#### 语言检查
-
-**判定**: {Pass/Partial/Fail}
-
-| 违规项 | 行号 | 内容 | 应为 |
-|--------|------|------|------|
-| {element-type} | {line} | `{actual}` | `{expected}` |
-
-> 无违规时输出: "语言检查通过，未发现违规项。"
-
-#### 模板检查（9 维度）
-
-| # | 维度 | 判定 | 说明 |
-|---|------|------|------|
-| 1 | Role Assignment | {Pass/Partial/Fail} | {evidence or gap} |
-| 2 | Context Provision | {Pass/Partial/Fail} | {evidence or gap} |
-| 3 | Data-Instruction Separation | {Pass/Partial/Fail} | {evidence or gap} |
-| 4 | Output Format Specification | {Pass/Partial/Fail} | {evidence or gap} |
-| 5 | Examples | {Pass/Partial/Fail} | {evidence or gap} |
-| 6 | Step-by-Step Procedure | {Pass/Partial/Fail} | {evidence or gap} |
-| 7 | Constraints | {Pass/Partial/Fail} | {evidence or gap} |
-| 8 | Clarity | {Pass/Partial/Fail} | {evidence or gap} |
-| 9 | Hallucination Guardrails | {Pass/Partial/Fail} | {evidence or gap} |
-
-#### 修复建议
-
-1. {具体修复建议，引用维度编号}
-2. {具体修复建议}
-3. ...
-
-> 全部通过时输出: "所有维度均已通过，无需修复。"
-
----
-
-## 总结
-
-| 判定 | 数量 |
-|------|------|
-| 通过 | {n} |
-| 需改进 | {n} |
-| 不合格 | {n} |
-
-**最常见问题**: {top 1-3 most frequent failing dimensions across all audited skills}
-````
-
----
-
-## 5. Linter Detection Quick-Reference
-
-Compact lookup table for the linter agent to pattern-match against.
-
-| Dimension | Positive Signal (any match → candidate Pass) | Negative Signal (none found → Fail) |
-|-----------|----------------------------------------------|-------------------------------------|
-| Role Assignment | `/^You are /i` in first 10 body lines | No persona-like statement |
-| Context Provision | Section header matching `context`, `background`, `prerequisites`, `dependencies`, `important rules` | No dedicated section |
-| Data-Instruction Separation | `<tag>`, `{{VAR}}`, `{var}` patterns | Raw inline data without delimiters |
-| Output Format | Code fence, table, or `template` / `format` / `schema` keyword near output description | No structured output spec |
-| Examples | `<example>` tag with `<input>` and `<output>` children | No `<example>` blocks |
-| Step-by-Step | Numbered list (`1.`, `2.`, ...) inside operational sections | Prose-only instructions for complex flows |
-| Constraints | `do NOT` / `NEVER` / `MUST NOT` + `don't know` / `cannot` / `unsupported` / `stop` | No prohibition or fallback |
-| Clarity | Short paragraphs, bullet lists, tables, clear conditionals | Wall-of-text paragraphs, nested conditionals |
-| Hallucination Guardrails | `fabricate` / `invent` / `make up` / `hallucinate` / `verify before` | No anti-hallucination language |
+Adapted on 2026-09-11 from the user-selected Codex `skill-creator` at `~/.codex/skills/.system/skill-creator/SKILL.md`: scoped instructions, proportional workflows, precise discovery, progressive disclosure and behavioral validation. This reference contains the needed criteria; that machine-specific path is provenance, not a runtime dependency.

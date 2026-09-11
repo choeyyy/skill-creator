@@ -2,6 +2,23 @@
 
 Create, lint, fix, and extract reusable Python scripts from Cursor Agent Skills. Eval-driven development with prompt engineering best practices.
 
+## Codex installation
+
+From this repository, run:
+
+```text
+python scripts/install_codex.py
+```
+
+This installs `$skill-lint` into `$CODEX_HOME/skills/skill-lint` (or `~/.codex/skills/skill-lint` when unset). It generates a self-contained copy of the canonical lint command, its five supporting documents and configuration, with Codex-compatible metadata and relative links. Start a new Codex task to discover it. Examples:
+
+```text
+$skill-lint <skill-path>
+$skill-lint <skill-path> --session <transcript-path> --provider codex
+```
+
+To refresh the installed copy after pulling a newer version, run the same script. Identical files are left untouched; differing files require reviewing local edits and passing `--overwrite`. `--destination <directory>` supports a different installation directory. The optional session parser is not installed automatically. Cursor keeps its existing `/SKILL-lint` entry.
+
 ## Prerequisites
 
 - [Cursor](https://cursor.sh/) IDE with Agent mode enabled
@@ -37,8 +54,8 @@ Then run `/SKILL-setup` in Cursor to complete configuration.
 | Command | Description |
 |:--------|:------------|
 | `/SKILL-creator` | Create, test, and iterate on skills with eval-driven development |
-| `/SKILL-lint` | Audit skill files for structural issues, best-practice violations, and spec drift |
-| `/SKILL-fix` | Auto-repair skill files — fix logic issues first, then format enforcement |
+| `/SKILL-lint` | Audit Skill quality, scope, and references; optionally review session evidence against a specified Skill/SOP and fix supported defects. |
+| `/SKILL-fix` | Legacy disabled entry; use the integrated `/SKILL-lint` fix flow |
 | `/SKILL-pythonGenerator` | Extract deterministic, repetitive logic into reusable Python CLI scripts |
 | `/SKILL-setup` | Install, update, configure, or uninstall the plugin |
 
@@ -51,9 +68,13 @@ Then run `/SKILL-setup` in Cursor to complete configuration.
 5. **Iterate** — improve the skill based on benchmark data, blind A/B comparison, and user feedback
 6. **Description optimize** — tune the skill description for trigger accuracy
 
-### SKILL-lint + SKILL-fix workflow
+### SKILL-lint workflow
 
-Run `/SKILL-lint` to audit any skill file. If issues are found, run `/SKILL-fix` to auto-repair them with diff confirmation before applying changes.
+Run `/SKILL-lint <skill-path>` for nine applicability-aware quality checks. N/A is excluded from the score; language follows the target's actual rules (`--language-profile local-english` explicitly selects the local convention). Useful concise skills do not need persona/XML/example boilerplate merely to pass. Findings cite source lines and applicable rules.
+
+Use `/SKILL-lint <skill-path> --session <transcript-path> --provider codex` for optional evidence review; the target is the baseline unless `--baseline <path>` adds another named Skill/SOP. These arguments are interpreted by the agent. The optional [upstream parser](https://github.com/patrickleehua/easily-skills/tree/78a5915750756c4851f6687ee50046348ace2810/cli-session-log-audit) supports Codex, Claude Code, Cursor agent transcripts and explicit generic exports; static lint has no parser dependency. Preserve original source references, human-input attribution and missing-history warnings. Report skill defects, execution deviations and unresolved evidence separately.
+
+Repair is integrated: an audit-only request produces findings and concrete proposed diffs for approval; an explicit scoped fix request already authorizes ordinary edits. Re-lint the result and distinguish applied changes from runtime validation. See [lint rules](skills/skill-creator/references/lint-rules.md) and [session evidence](skills/skill-creator/references/session-audit.md).
 
 ### SKILL-pythonGenerator
 
@@ -61,7 +82,7 @@ Scans skills for deterministic, repetitive logic (aggregation, validation, forma
 
 ## Configuration
 
-Plugin defaults are stored in `config/defaults.json`:
+Plugin defaults are stored in `config/defaults.json`. The `lint_rules` fields below are legacy authoring conventions, not universal audit failures; audit applicability and policy are defined in `skills/skill-creator/references/lint-rules.md`:
 
 ```json
 {

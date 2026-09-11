@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.0.0] - 2026-09-11
+
+- Add a self-contained Codex `$skill-lint` installer using the same command and supporting rules as Cursor, with compatible metadata and resolved relative links.
+- Replace literal template scoring with nine applicability-aware quality checks; report N/A, unknown evidence and target-specific language conventions explicitly.
+- Add optional source-traceable session/SOP auditing, separating skill defects from execution deviations and unresolved evidence.
+- Integrate minimal fixes into lint, preserve prior scoped authorization and distinguish proposed, applied and behaviorally verified outcomes.
+- Validate the installer with isolated copy, link, repeat-install and conflict tests. Upstream session parser fixtures passed; this does not certify live Agent behavior.
+
 ## [0.2.0] - 2025-06-26
 
 ### Migration from v0.1.0

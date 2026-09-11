@@ -150,7 +150,7 @@ For each of the 4 command skills, create `SKILLS_DIR/<name>/SKILL.md`:
 | name | description |
 |------|------------|
 | skill-creator | Skill lifecycle — create, test, iterate, and optimize Cursor Agent Skills. |
-| SKILL-lint | Audit Skill files for quality — language discipline, template compliance, 9-dimension checks. |
+| SKILL-lint | Audit Skill quality, scope, and references; optionally review session evidence against a specified Skill/SOP and fix supported defects. |
 | SKILL-fix | AI-assisted issue fixing — auto-fix lint failures with configurable retry rounds. |
 | SKILL-pythonGenerator | Extract deterministic logic from Skills into reusable Python CLI scripts. |
 
@@ -195,7 +195,7 @@ Present results:
 
   [ok] SKILL-setup          — 安装/更新/配置引导（本命令）
   [ok] skill-creator        — Skill 全生命周期（创建/测试/迭代）
-  [ok] SKILL-lint           — Skill 质量审计（模板合规 + 9维检查）
+  [ok] SKILL-lint           — Skill 质量审计（适用性判据 + 可选会话证据）
   [ok] SKILL-fix            — 自动修复 lint 问题
   [ok] SKILL-pythonGenerator — 提取确定性逻辑为 Python 脚本
 

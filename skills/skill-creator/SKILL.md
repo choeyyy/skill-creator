@@ -21,8 +21,7 @@ Detect where the user is and route to the correct phase. Check these signals in 
 ### Command routing (takes priority)
 
 ```
-IF user invoked /SKILL-lint  → §7 Lint Audit
-IF user invoked /SKILL-fix   → §8 Auto-Fix
+IF user invoked /SKILL-lint  → §7 Lint Audit (includes optional fix)
 IF user invoked /SKILL-pythonGenerator → §9 Script Extraction
 OTHERWISE → continue to lifecycle detection below
 ```
@@ -73,7 +72,7 @@ Show a brief results summary from `benchmark.json`, then ask:
 - Option 1 → §5 Iteration
 - Option 2 → §6 Description Optimization
 - Option 3 → §4 Test Execution
-- Option 4 → run §7 Lint Audit first; if lint passes, copy `workspace/SKILL.md` (and references/) to user's chosen location; if lint fails, show findings and offer §8 Auto-Fix before completing export
+- Option 4 → run §7 Lint Audit first; if lint passes, copy `workspace/SKILL.md` (and references/) to user's chosen location; if lint fails, show findings and offer to fix (via the fix flow in `commands/SKILL-lint.md`) before completing export
 
 ---
 
@@ -402,13 +401,13 @@ Apply the winning description to `workspace/SKILL.md` frontmatter.
 
 ## 7. Lint Audit
 
-See `commands/SKILL-lint.md` for scope resolution, dispatch strategy, and reporting logic. Dispatches to `agents/linter.md` (Haiku sub-agent).
+Read [SKILL-lint](../../commands/SKILL-lint.md) for scope resolution, applicability-aware static checks, optional session evidence and reporting. Use `agents/linter.md` inline or through delegation when permitted. Static lint does not require personal session access.
 
 ---
 
 ## 8. Auto-Fix
 
-See `commands/SKILL-fix.md` for entry points, fix procedure, and confirmation gate. Dispatches to `agents/fixer.md` (Haiku sub-agent).
+Fix is integrated into [SKILL-lint](../../commands/SKILL-lint.md). Use `agents/fixer.md` for minimal evidence-supported proposals; preserve existing user authorization and distinguish proposed, applied and behaviorally verified changes.
 
 ---
 
@@ -427,7 +426,8 @@ These files contain detailed protocols referenced throughout this skill. Read th
 | `references/writing-guide.md` | Prompt engineering techniques for skill authoring: imperative form, explain-why, pushy descriptions, progressive disclosure, few-shot patterns |
 | `references/eval-workflow.md` | Full eval protocol: test case format, execution details, grading rubric, benchmark computation |
 | `references/schemas.md` | JSON schemas for `evals.json`, `grading.json`, `benchmark.json`, `history.json`, `timing.json` |
-| `references/lint-rules.md` | 9-dimension criteria definitions, scoring rubric, language rules, report template |
+| `references/lint-rules.md` | Applicable quality criteria, language-policy sources, scoring and report contract |
+| `references/session-audit.md` | Optional session facts, source traceability, baseline comparison and defect attribution |
 | `references/fix-report-format.md` | Fix operation report format (Chinese): findings, fixes, validation, remaining issues |
 | `references/extraction-patterns.md` | Common extractable patterns catalog with detection heuristics |
 

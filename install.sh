@@ -19,7 +19,7 @@ SKILL_NAMES=(SKILL-setup skill-creator SKILL-lint SKILL-fix SKILL-pythonGenerato
 SKILL_DESCS=(
     "Install, update, or configure the skill-creator plugin. Environment check, guided install, agent model selection."
     "Create, test, and iterate on Cursor Agent Skills with eval-driven development. Full lifecycle: intent capture, drafting, testing, grading, iteration, description optimization."
-    "Audit Skill quality — language discipline (English body / Chinese output) + 9-dimension prompt-engineering template compliance. Parallel sub-agent dispatch for batch audit."
+    "Audit Skill quality, scope, and references; optionally review session evidence against a specified Skill/SOP and fix supported defects."
     "Auto-repair Skill issues — fix logic first, then enforce format (English, Chinese summary, template, 500-line limit). Deterministic validation + diff confirmation."
     "Extract deterministic/repetitive logic from Skills into reusable Python CLI scripts. Single-skill or cross-skill scan."
 )

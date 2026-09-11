@@ -38,12 +38,8 @@ SKILLS = [
     },
     {
         "name": "SKILL-lint",
-        "desc": (
-            "Audit Skill quality \u2014 language discipline (English body / "
-            "Chinese output) + 9-dimension prompt-engineering template "
-            "compliance. Parallel sub-agent dispatch for batch audit."
-        ),
-        "path": "skills/skill-creator/SKILL.md",
+        "desc": ('Audit Skill quality, scope, and references; optionally review session evidence against a specified Skill/SOP and fix supported defects.'),
+        "path": "commands/SKILL-lint.md",
     },
     {
         "name": "SKILL-fix",

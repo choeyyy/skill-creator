@@ -23,7 +23,7 @@ $SKILLS_DIR = Join-Path $env:USERPROFILE ".cursor\skills"
 $SKILL_NAMES = @(
     @{ name = "SKILL-setup";            desc = "Install, update, or configure the skill-creator plugin. Environment check, guided install, agent model selection."; path = "setup/SKILL.md" },
     @{ name = "skill-creator";          desc = "Create, test, and iterate on Cursor Agent Skills with eval-driven development. Full lifecycle: intent capture, drafting, testing, grading, iteration, description optimization."; path = "skills/skill-creator/SKILL.md" },
-    @{ name = "SKILL-lint";             desc = "Audit Skill quality — language discipline (English body / Chinese output) + 9-dimension prompt-engineering template compliance. Parallel sub-agent dispatch for batch audit."; path = "commands/SKILL-lint.md" },
+    @{ name = "SKILL-lint";             desc = "Audit Skill quality, scope, and references; optionally review session evidence against a specified Skill/SOP and fix supported defects."; path = "commands/SKILL-lint.md" },
     @{ name = "SKILL-fix";              desc = "Auto-repair Skill issues — fix logic first, then enforce format (English, Chinese summary, template, 500-line limit). Deterministic validation + diff confirmation."; path = "commands/SKILL-fix.md" },
     @{ name = "SKILL-pythonGenerator";  desc = "Extract deterministic/repetitive logic from Skills into reusable Python CLI scripts. Single-skill or cross-skill scan."; path = "commands/SKILL-pythonGenerator.md" }
 )

@@ -1,7 +1,7 @@
 {
   "name": "skill-creator",
   "displayName": "Skill Creator",
-  "version": "0.2.0",
+  "version": "1.0.0",
   "description": "Create, lint, fix, and extract reusable Python scripts from Cursor Agent Skills. Eval-driven development with prompt engineering best practices.",
   "author": {
     "name": "cenhuiying"
@@ -34,13 +34,8 @@
     },
     {
       "name": "SKILL-lint",
-      "description": "Audit skill files for structural issues, best-practice violations, and spec drift",
+      "description": "Audit Skill quality, scope, and references; optionally review session evidence against a specified Skill/SOP and fix supported defects.",
       "entry": "commands/SKILL-lint.md"
-    },
-    {
-      "name": "SKILL-fix",
-      "description": "Auto-repair skill files — fix logic issues first, then format enforcement, with diff confirmation",
-      "entry": "commands/SKILL-fix.md"
     },
     {
       "name": "SKILL-pythonGenerator",
